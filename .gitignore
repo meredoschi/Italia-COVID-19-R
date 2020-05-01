@@ -1,0 +1,10 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+drafts/
+.DS_Store
+*.zip
+csv_exports
+*.html
+!README.html

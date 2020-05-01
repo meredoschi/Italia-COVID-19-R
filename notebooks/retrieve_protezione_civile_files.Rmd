@@ -1,0 +1,79 @@
+---
+title: "Notebook to retrieve the Protezione Civile csv files directly"
+author: "Marcelo Eduardo Redoschi"
+date: "1-May-2020"
+html_document: default
+---
+
+## This is an alternative approach (i.e. rather than using the *git submodule*), since the csv file name and locations appear to remain consistent in the source dataset. 
+
+```{r echo=FALSE, message=FALSE}
+# Initial setup (Libraries and paths)
+library(markdown)
+
+main_dir <-
+file.path(getwd(), "..") # Project's main directory (top level)
+#list.files(main_dir)
+datasets_path<-file.path(main_dir, "Protezione-Civile-Dataset","COVID-19") 
+notebooks_dir <- file.path(main_dir, "notebooks")
+
+dpc_covid_19_github_url<-"https://raw.githubusercontent.com/pcm-dpc/COVID-19/master"
+
+```
+
+```{r echo=FALSE, message=FALSE}
+
+# ***** National data *****
+national_data_folder_name<-"dati-andamento-nazionale"
+
+# URLs
+dpc_covid_19_national_data_folder_url<-paste(dpc_covid_19_github_url,national_data_folder_name,sep="/")
+dpc_covid_19_national_data_csv_fname<-"dpc-covid19-ita-andamento-nazionale.csv"
+dpc_covid_19_national_data_csv_url<-paste(dpc_covid_19_national_data_folder_url,dpc_covid_19_national_data_csv_fname,sep="/")
+
+# File paths 
+dpc_national_path<-file.path(datasets_path,national_data_folder_name)
+
+dpc_covid_19_national_data_csv_full_path<-file.path(dpc_national_path, dpc_covid_19_national_data_csv_fname)
+
+```
+
+### National 
+**dpc-covid19-ita-andamento-nazionale.csv**
+```{r echo=FALSE, message=FALSE}
+download.file(dpc_covid_19_national_data_csv_url,dpc_covid_19_national_data_csv_full_path)
+list.files(dpc_national_path)
+```
+
+```{r echo=FALSE, message=FALSE}
+# ***** Provincial data *****
+provincial_data_folder_name<-"dati-province"
+
+# URLs
+dpc_covid_19_provincial_data_folder_url<-paste(dpc_covid_19_github_url,provincial_data_folder_name,sep="/")
+dpc_covid_19_provincial_data_csv_fname<-"dpc-covid19-ita-province.csv"
+dpc_covid_19_provincial_data_csv_url<-paste(dpc_covid_19_provincial_data_folder_url,dpc_covid_19_provincial_data_csv_fname,sep="/")
+
+# File paths 
+
+dpc_provincial_path<-file.path(datasets_path,provincial_data_folder_name)
+
+dpc_covid_19_provincial_data_csv_full_path<-file.path(dpc_provincial_path, dpc_covid_19_provincial_data_csv_fname)
+
+# *************************
+
+pre_processing_dir <- file.path(main_dir, "optional_pre_processing")
+
+datasets_path<-file.path(main_dir, "Protezione-Civile-Dataset","COVID-19") 
+ 
+provincial_data_folder<-"dati-province"
+provincial_data_csv_fname<-file.path(datasets_path,provincial_data_folder)
+
+```
+
+### Provinces 
+**dpc-covid19-ita-province.csv**
+```{r echo=FALSE, message=FALSE}
+download.file(dpc_covid_19_provincial_data_csv_url,dpc_covid_19_provincial_data_csv_full_path)
+list.files(dpc_provincial_path)
+```

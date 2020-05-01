@@ -1,0 +1,58 @@
+---
+title: "Optional - Notebook to recreate the istat_population.csv file"
+author: "Marcelo Eduardo Redoschi"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+Based on DCIS_POPRES1_11042020115451140.csv, originally exported from the ISTAT website
+
+"http://dati.istat.it/Index.aspx?QueryId=18460&lang=en"
+
+```{r echo=FALSE, message=FALSE}
+# Initial setup (Libraries and paths)
+library(readr)
+library(lubridate)
+library(dplyr)
+library(markdown)
+main_dir <-
+file.path(getwd(), "..", "..") # Project's main directory (top level)
+list.files(main_dir)
+notebooks_dir <- file.path(main_dir, "notebooks")
+
+source(file.path(notebooks_dir, "helper_functions.R"))
+
+pre_processing_dir <- file.path(main_dir, "optional_pre_processing")
+
+csv_input_dir <- file.path(main_dir, "csv_input")
+prepared_data_dir <-
+file.path(pre_processing_dir, "prepared_data_csv")
+
+istat_pop_zip_file_name <-
+file.path(csv_input_dir, "DCIS_POPRES1_11042020115451140.zip")
+
+istat_pop_input_file_name <-
+file.path(csv_input_dir, "DCIS_POPRES1_11042020115451140.csv")
+
+if (!file.exists(istat_pop_input_file_name)) {
+
+print(csv_input_dir)
+unzip(istat_pop_zip_file_name, exdir = csv_input_dir)
+
+list.files(csv_input_dir)
+  
+}
+
+istat_population <-
+process_istat_population_csv(istat_pop_input_file_name)
+istat_pop_output_file_name<-file.path(prepared_data_dir,"istat_population.csv")
+write.csv(istat_population, istat_pop_output_file_name, row.names = FALSE)
+
+
+```
+
+
+```{r echo=FALSE, message=FALSE}
+
+```
