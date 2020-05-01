@@ -1,15 +1,18 @@
----
-title: Italia-COVID-19 repository (*lean* branch)
-output: html_document
----
+## README (Italia-COVID-19-R)
 
-## README 
+--- 
+
+#### I think of this repository as a *leaner* branch of [https://github.com/meredoschi/Italia-COVID-19](https://github.com/meredoschi/Italia-COVID-19).
+
+##### Practically the same, but without the html notebook files and some other details.   
+
+--- 
 
 ### I. Introduction
 
-This repository contains some of my own, personal calculations, regarding the current COVID-10 epidemic in Italy.  
+This repository contains some of my own personal, calculations, regarding the current COVID-10 epidemic in Italy.  
 
-I do hope these charts and possible insights may be useful somehow, especially if you are in a professional capacity in this veritable fight against the disease. 
+I do hope these notebooks (which include the ability to produce charts) and the possible insights may be useful somehow, especially if you are in a professional capacity in this veritable fight against the disease. 
 
 *I am not an epidemiologist, just a simple mathematician.*
 
@@ -63,15 +66,21 @@ For questions or further information regarding the DPC project repository, kindl
 
 #### *Steps*
 
-1. Open a git or terminal window, outside any existing R projects.  
-      
-      *Or navigate to such a directory.*
+1. Choose File, New project...
 
-2. Type: `git clone -b lean https://github.com/meredoschi/Italia-COVID-19`
+ - (Create project) Version control (checkout a project from a version control repository)
 
-     *This should retrieve the lean branch only.* 
+ -  Git (clone a project from a git repository)
 
-3. Start RStudio and open the project.
+ - Repository URL: https://github.com/meredoschi/Italia-COVID-19-R 
+
+2. Open a git or terminal window, outside any existing R projects.  
+
+     *Or navigate to such a directory.*
+
+   - Type: `git clone https://github.com/meredoschi/Italia-COVID-19-R`
+
+   - Start RStudio and open the project.
 
 --- 
 
