@@ -1,6 +1,13 @@
 # Marcelo Eduardo Redoschi
 # helper functions - COVID 19 calculations
-# Last updated: 22 - 4 - 2020
+# Last updated: 2 - 5 - 2020
+
+# argument = the directory's full path
+create_directory_if_needed<-function(fullpath) { 
+
+  if (!dir.exists(fullpath)) {dir.create(fullpath)}
+  
+}
 
 import_csv<-function(fname) { 
   # na.string explicitly set since NA is by coincidence, the Naples province abbreviation!

@@ -11,9 +11,12 @@ library(dplyr)
 library(markdown)
 library(ggplot2)
 source("helper_functions.R")
+main_dir <-
+file.path(getwd(), "..") # Project's main directory (top level)
 datasets_path <-
-file.path(getwd(), "..", "Protezione-Civile-Dataset", "COVID-19")
-csv_exports_dir <- file.path(getwd(), "..", "csv_exports") 
+file.path(main_dir, "Protezione-Civile-Dataset", "COVID-19")
+csv_exports_dir <- file.path(main_dir, "csv_exports") 
+if (!dir.exists(csv_exports_dir)) {dir.create(csv_exports_dir)}
 ```
 
 ```{r echo=FALSE, message=FALSE}

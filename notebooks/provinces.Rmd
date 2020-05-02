@@ -36,6 +36,7 @@ pre_processing_dir<-file.path(main_dir,"optional_pre_processing")
 prepared_data_dir<-file.path(pre_processing_dir, "prepared_data_csv") 
 datasets_path<-file.path(main_dir, "Protezione-Civile-Dataset","COVID-19") 
 csv_exports_dir<-file.path(main_dir, "csv_exports") 
+create_directory_if_needed(csv_exports_dir)
 ```
 
 
