@@ -41,6 +41,7 @@ dpc_covid_19_national_data_csv_full_path<-file.path(dpc_national_path, dpc_covid
 ### National 
 **dpc-covid19-ita-andamento-nazionale.csv**
 ```{r echo=FALSE, message=FALSE}
+
 download.file(dpc_covid_19_national_data_csv_url,dpc_covid_19_national_data_csv_full_path)
 list.files(dpc_national_path)
 ```
@@ -74,6 +75,29 @@ provincial_data_csv_fname<-file.path(datasets_path,provincial_data_folder)
 ### Provinces 
 **dpc-covid19-ita-province.csv**
 ```{r echo=FALSE, message=FALSE}
-download.file(dpc_covid_19_provincial_data_csv_url,dpc_covid_19_provincial_data_csv_full_path)
+
+most_recent_dpc_covid_19_provincial_data_csv<-gsub("csv","tmp",dpc_covid_19_national_data_csv_full_path)
+
+download.file(dpc_covid_19_provincial_data_csv_url,most_recent_dpc_covid_19_provincial_data_csv)
+
+most_recent_dpc_covid_19_provincial_data_csv_sha256<-digest(most_recent_dpc_covid_19_provincial_data_csv, algo="sha256", file = TRUE)
+
+if (file.exists(dpc_covid_19_provincial_data_csv_full_path)) {
+
+   dpc_covid_19_provincial_data_csv_sha256<-digest(dpc_covid_19_national_data_csv_full_path, algo="sha256", file = TRUE)
+   
+  most_recent_dpc_covid_19_provincial_data_csv_sha256<-digest(most_recent_dpc_covid_19_provincial_data_csv, algo="sha256", file = TRUE)
+  
+   if  (dpc_covid_19_provincial_data_csv_sha256==most_recent_dpc_covid_19_provincial_data_csv_sha256) 
+   { 
+       print("File does not need to be updated.")
+       print(most_recent_dpc_covid_19_provincial_data_csv_sha256)  
+        
+    } else { 
+      print("A different file was detected.")
+   }
+   
+
+#download.file(dpc_covid_19_provincial_data_csv_url,dpc_covid_19_provincial_data_csv_full_path)
 list.files(dpc_provincial_path)
 ```

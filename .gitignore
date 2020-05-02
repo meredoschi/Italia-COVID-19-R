@@ -7,4 +7,6 @@ drafts/
 *.zip
 csv_exports/*
 */*.html
+*/*.tmp
 !README.html
+Protezione-Civile-Dataset/*
