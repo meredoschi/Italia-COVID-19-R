@@ -5,6 +5,6 @@
 drafts/
 .DS_Store
 *.zip
-csv_exports
+#csv_exports/*.csv
 */*.html
 !README.html
