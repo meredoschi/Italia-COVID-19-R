@@ -310,11 +310,14 @@ prov_calc_sel <- filtered_for_the_most_recent_days(prov_calc_sel, 1)
 
 prov_calc_sel <- translated_province_column_names(prov_calc_sel)
 
+# restricted by date
+provinces_calculations<-provinces_calculations[provinces_calculations$dt>'2020-4-15',]
+
 ```
 
 ```{r  fig.height=5, fig.width=10, echo=FALSE, message=FALSE}
 
- for (i in 1:nrow(italian_regions)) {
+for (i in 1:nrow(italian_regions)) {
 
 selected_region <- italian_regions[i,]
 
@@ -384,57 +387,63 @@ local_province_name <- local_province_names[j]
 
 local_province_data <-
 total_cases_by_province[total_cases_by_province$province_name == local_province_name,]
-num_days_recorded <- nrow(local_province_data)
-local_province_data$total_cases_day_before <-
-head_na(local_province_data$total_cases, 1)
-local_province_data$total_cases_three_days_before <-
-head_na(local_province_data$total_cases, 3)
-local_province_data$total_cases_seven_days_before <-
-head_na(local_province_data$total_cases, 7)
 
-local_province_data$current_rate <-
-(local_province_data$total_cases) / (local_province_data$total_cases_day_before)
-local_province_data$current_perc_rate <-
-(local_province_data$current_rate - 1) * 100
-local_province_data$growth_factor_in_three_days <-
-((local_province_data$total_cases) / (local_province_data$total_cases_three_days_before)
-)
-local_province_data$growth_factor_in_seven_days <-
-((local_province_data$total_cases) / (local_province_data$total_cases_seven_days_before)
-)
-local_province_data$seven_day_rate <-
-'^'(local_province_data$growth_factor_in_seven_days, 1 / 7)
-local_province_data$seventh_perc_rate <-
+local_province_data<-add_three_and_seven_day_rate_columns(local_province_data,"total_cases")
 
-(local_province_data$seven_day_rate - 1) * 100
-local_province_data$cubic_rate <-
-'^'(local_province_data$growth_factor_in_three_days, 1 / 3)
-local_province_data$cubic_perc_rate <-
-(local_province_data$cubic_rate - 1) * 100
+# num_days_recorded <- nrow(local_province_data)
+# local_province_data$total_cases_day_before <-
+# head_na(local_province_data$total_cases, 1)
+# local_province_data$total_cases_three_days_before <-
+# head_na(local_province_data$total_cases, 3)
+# local_province_data$total_cases_seven_days_before <-
+# head_na(local_province_data$total_cases, 7)
+# 
+# local_province_data$current_rate <-
+# (local_province_data$total_cases) / (local_province_data$total_cases_day_before)
+# local_province_data$current_perc_rate <-
+# (local_province_data$current_rate - 1) * 100
+# local_province_data$growth_factor_in_three_days <-
+# ((local_province_data$total_cases) / (local_province_data$total_cases_three_days_before)
+# )
+# local_province_data$growth_factor_in_seven_days <-
+# ((local_province_data$total_cases) / (local_province_data$total_cases_seven_days_before)
+# )
+# local_province_data$seven_day_rate <-
+# '^'(local_province_data$growth_factor_in_seven_days, 1 / 7)
+# local_province_data$seventh_perc_rate <-
+# 
+# (local_province_data$seven_day_rate - 1) * 100
+# local_province_data$cubic_rate <-
+# '^'(local_province_data$growth_factor_in_three_days, 1 / 3)
+# local_province_data$cubic_perc_rate <-
+# (local_province_data$cubic_rate - 1) * 100
 
-local_province_rates <-
-local_province_data[is.finite(local_province_data$cubic_perc_rate),]
+#local_province_rates <-
+#local_province_data[is.finite(local_province_data$cubic_perc_rate),]
 
 
 local_province_rates2 <-
 local_province_data[is.finite(local_province_data$seventh_perc_rate),]
 
-province_chart <-
-provincial_cubic_rate_chart(local_province_rates, local_province_name)
+#province_chart <-
+#provincial_cubic_rate_chart(local_province_rates, local_province_name)
 
-print(province_chart)
+#print(province_chart)
 
 
-province_chart2 <-
-provincial_seven_day_rate_chart(local_province_rates2, local_province_name)
+#province_chart2 <-
+#provincial_seven_day_rate_chart(local_province_rates2, local_province_name)
 
-print(province_chart2)
+#print(province_chart2)
 
+combined_chart<-provincial_combined_rates_chart(local_province_rates2, local_province_name)
+
+print(combined_chart)
 }
 
 rm(local_provinces)
-rm(province_chart)
-rm(province_chart2)
+#rm(province_chart)
+#rm(province_chart2)
 } # regions loop
 
 ```

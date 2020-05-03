@@ -517,6 +517,29 @@ current_and_seven_day_rate_chart <-
     chart
   }
 
+# More generic formulation 
+combined_rates_chart <-
+  function(df,
+           title_txt,
+           x_label_prefix,
+           current_rate_color,
+           cubic_rate_color,
+           seventh_rate_color) {
+    
+    chart <-
+      ggplot(data = df) + geom_line(aes(x = dt, y = seventh_perc_rate),
+                                    color = seventh_rate_color,
+                                    linetype = 2) + geom_line(aes(x = dt, y = current_perc_rate), color = current_rate_color) +
+    geom_line(aes(x = dt, y = cubic_perc_rate), color = cubic_rate_color,linetype = 4) +
+      ggtitle(title_txt) + xlab(paste(
+        x_label_prefix,
+        format(min(df$dt), "%d %b"),
+        "-",
+        format(max(df$dt), "%d %b %Y")
+      )) + ylab("current vs. previous 3 and 7 day average % growth rates")
+    chart
+  }
+
 provincial_cubic_rate_chart <- function(df, selected_province_name) {
 
   # Set the appropriate parameters
@@ -533,6 +556,23 @@ provincial_cubic_rate_chart <- function(df, selected_province_name) {
   
 }
 
+provincial_combined_rates_chart <- function(df, selected_province_name) {
+  
+  # Set the appropriate parameters
+  title_txt <- paste(selected_province_name, "province")
+  x_label_prefix <- 'COVID-19 total case progression'
+  current_rate_color <- "#017365"
+  cubic_rate_color <- "#540331"
+  seventh_rate_color <- "orange"
+  
+  combined_rates_chart(df,
+                               title_txt,
+                               x_label_prefix,
+                               current_rate_color,
+                               cubic_rate_color,
+                               seventh_rate_color)
+  
+}
 provincial_seven_day_rate_chart <-
   
   function(df, selected_province_name) {
