@@ -9,6 +9,30 @@ create_directory_if_needed<-function(fullpath) {
   
 }
 
+
+retrieve_url<-function(dpc_covid_19_provincial_data_csv_url,dpc_covid_19_provincial_data_csv_full_path) { 
+  
+most_recent_dpc_covid_19_provincial_data_csv<-gsub("csv","tmp",dpc_covid_19_provincial_data_csv_full_path)
+previous_dpc_covid_19_provincial_data_csv<-gsub("csv","bak",dpc_covid_19_provincial_data_csv_full_path)
+
+download.file(dpc_covid_19_provincial_data_csv_url,most_recent_dpc_covid_19_provincial_data_csv)
+
+if (file.exists(previous_dpc_covid_19_provincial_data_csv)) {
+  file.remove(previous_dpc_covid_19_provincial_data_csv)
+}
+
+if (file.exists(dpc_covid_19_provincial_data_csv_full_path)) {
+  
+  file.rename(dpc_covid_19_provincial_data_csv_full_path, previous_dpc_covid_19_provincial_data_csv)
+} 
+
+if (file.exists(most_recent_dpc_covid_19_provincial_data_csv)) { 
+  
+  file.rename(most_recent_dpc_covid_19_provincial_data_csv, dpc_covid_19_provincial_data_csv_full_path)
+  
+}
+
+} 
 import_csv<-function(fname) { 
   # na.string explicitly set since NA is by coincidence, the Naples province abbreviation!
   read.csv(fname,encoding="UTF-8", na.strings="undefined")   
