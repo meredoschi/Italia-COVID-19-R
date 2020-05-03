@@ -398,7 +398,7 @@ write.csv(nat_calc, file.path(csv_exports_dir, "nat_calc.csv"))
 ---
 ```{r echo=FALSE, message=FALSE}
 finish_time<-Sys.time()
-running_time<-(finish_time-start_time)
+running_time<-as.POSIXct(finish_time)-as.POSIXct(start_time)
 ```
 *This document's processing time: `r running_time`*
 

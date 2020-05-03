@@ -1,20 +1,25 @@
 ---
 title: "Notebook to retrieve the Protezione Civile csv files directly"
 author: "Marcelo Eduardo Redoschi"
-date: "1-May-2020"
+date: "3-May-2020"
 html_document: default
 ---
 
-## This is an alternative approach (i.e. rather than using the *git submodule*), since the csv file name and locations appear to remain consistent in the source dataset. 
+## This is an alternative approach (i.e. rather than using the *git submodule*), since the csv file name and locations appear to remain consistent in the source dataset.
 
 ```{r echo=FALSE, message=FALSE}
 # Initial setup (Libraries and paths)
 library(markdown)
-
+#library(digest)
+source(file.path(getwd(),"helper_functions.R"))
 main_dir <-
 file.path(getwd(), "..") # Project's main directory (top level)
 #list.files(main_dir)
-datasets_path<-file.path(main_dir, "Protezione-Civile-Dataset","COVID-19") 
+datasets_path<-file.path(main_dir, "Protezione-Civile-Dataset","COVID-19")
+
+create_directory_if_needed(file.path(main_dir, "Protezione-Civile-Dataset"))
+create_directory_if_needed(datasets_path)
+
 notebooks_dir <- file.path(main_dir, "notebooks")
 
 dpc_covid_19_github_url<-"https://raw.githubusercontent.com/pcm-dpc/COVID-19/master"
@@ -31,19 +36,39 @@ dpc_covid_19_national_data_folder_url<-paste(dpc_covid_19_github_url,national_da
 dpc_covid_19_national_data_csv_fname<-"dpc-covid19-ita-andamento-nazionale.csv"
 dpc_covid_19_national_data_csv_url<-paste(dpc_covid_19_national_data_folder_url,dpc_covid_19_national_data_csv_fname,sep="/")
 
-# File paths 
+# File paths
 dpc_national_path<-file.path(datasets_path,national_data_folder_name)
 
 dpc_covid_19_national_data_csv_full_path<-file.path(dpc_national_path, dpc_covid_19_national_data_csv_fname)
 
 ```
 
-### National 
+### National
 **dpc-covid19-ita-andamento-nazionale.csv**
 ```{r echo=FALSE, message=FALSE}
 
-download.file(dpc_covid_19_national_data_csv_url,dpc_covid_19_national_data_csv_full_path)
-list.files(dpc_national_path)
+create_directory_if_needed(dpc_national_path)
+
+most_recent_dpc_covid_19_national_data_csv<-gsub("csv","tmp",dpc_covid_19_national_data_csv_full_path)
+previous_dpc_covid_19_national_data_csv<-gsub("csv","bak",dpc_covid_19_national_data_csv_full_path)
+
+download.file(dpc_covid_19_national_data_csv_url,most_recent_dpc_covid_19_national_data_csv)
+
+if (file.exists(previous_dpc_covid_19_national_data_csv)) {
+        file.remove(previous_dpc_covid_19_national_data_csv)
+}
+
+if (file.exists(dpc_covid_19_national_data_csv_full_path)) {
+  
+file.rename(dpc_covid_19_national_data_csv_full_path, previous_dpc_covid_19_national_data_csv)
+} 
+
+if (file.exists(most_recent_dpc_covid_19_national_data_csv)) { 
+            
+  file.rename(most_recent_dpc_covid_19_national_data_csv, dpc_covid_19_national_data_csv_full_path)
+
+}
+
 ```
 
 ```{r echo=FALSE, message=FALSE}
@@ -55,49 +80,38 @@ dpc_covid_19_provincial_data_folder_url<-paste(dpc_covid_19_github_url,provincia
 dpc_covid_19_provincial_data_csv_fname<-"dpc-covid19-ita-province.csv"
 dpc_covid_19_provincial_data_csv_url<-paste(dpc_covid_19_provincial_data_folder_url,dpc_covid_19_provincial_data_csv_fname,sep="/")
 
-# File paths 
+# File paths
 
 dpc_provincial_path<-file.path(datasets_path,provincial_data_folder_name)
 
 dpc_covid_19_provincial_data_csv_full_path<-file.path(dpc_provincial_path, dpc_covid_19_provincial_data_csv_fname)
 
-# *************************
-
-pre_processing_dir <- file.path(main_dir, "optional_pre_processing")
-
-datasets_path<-file.path(main_dir, "Protezione-Civile-Dataset","COVID-19") 
- 
+create_directory_if_needed(dpc_provincial_path)
 provincial_data_folder<-"dati-province"
 provincial_data_csv_fname<-file.path(datasets_path,provincial_data_folder)
-
 ```
 
-### Provinces 
+### Provinces
 **dpc-covid19-ita-province.csv**
 ```{r echo=FALSE, message=FALSE}
 
-most_recent_dpc_covid_19_provincial_data_csv<-gsub("csv","tmp",dpc_covid_19_national_data_csv_full_path)
+most_recent_dpc_covid_19_provincial_data_csv<-gsub("csv","tmp",dpc_covid_19_provincial_data_csv_full_path)
+previous_dpc_covid_19_provincial_data_csv<-gsub("csv","bak",dpc_covid_19_provincial_data_csv_full_path)
 
 download.file(dpc_covid_19_provincial_data_csv_url,most_recent_dpc_covid_19_provincial_data_csv)
 
-most_recent_dpc_covid_19_provincial_data_csv_sha256<-digest(most_recent_dpc_covid_19_provincial_data_csv, algo="sha256", file = TRUE)
+if (file.exists(previous_dpc_covid_19_provincial_data_csv)) {
+        file.remove(previous_dpc_covid_19_provincial_data_csv)
+}
 
 if (file.exists(dpc_covid_19_provincial_data_csv_full_path)) {
-
-   dpc_covid_19_provincial_data_csv_sha256<-digest(dpc_covid_19_national_data_csv_full_path, algo="sha256", file = TRUE)
-   
-  most_recent_dpc_covid_19_provincial_data_csv_sha256<-digest(most_recent_dpc_covid_19_provincial_data_csv, algo="sha256", file = TRUE)
   
-   if  (dpc_covid_19_provincial_data_csv_sha256==most_recent_dpc_covid_19_provincial_data_csv_sha256) 
-   { 
-       print("File does not need to be updated.")
-       print(most_recent_dpc_covid_19_provincial_data_csv_sha256)  
-        
-    } else { 
-      print("A different file was detected.")
-   }
-   
+file.rename(dpc_covid_19_provincial_data_csv_full_path, previous_dpc_covid_19_provincial_data_csv)
+} 
 
-#download.file(dpc_covid_19_provincial_data_csv_url,dpc_covid_19_provincial_data_csv_full_path)
-list.files(dpc_provincial_path)
+if (file.exists(most_recent_dpc_covid_19_provincial_data_csv)) { 
+            
+  file.rename(most_recent_dpc_covid_19_provincial_data_csv, dpc_covid_19_provincial_data_csv_full_path)
+
+}
 ```

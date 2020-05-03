@@ -390,60 +390,17 @@ total_cases_by_province[total_cases_by_province$province_name == local_province_
 
 local_province_data<-add_three_and_seven_day_rate_columns(local_province_data,"total_cases")
 
-# num_days_recorded <- nrow(local_province_data)
-# local_province_data$total_cases_day_before <-
-# head_na(local_province_data$total_cases, 1)
-# local_province_data$total_cases_three_days_before <-
-# head_na(local_province_data$total_cases, 3)
-# local_province_data$total_cases_seven_days_before <-
-# head_na(local_province_data$total_cases, 7)
-# 
-# local_province_data$current_rate <-
-# (local_province_data$total_cases) / (local_province_data$total_cases_day_before)
-# local_province_data$current_perc_rate <-
-# (local_province_data$current_rate - 1) * 100
-# local_province_data$growth_factor_in_three_days <-
-# ((local_province_data$total_cases) / (local_province_data$total_cases_three_days_before)
-# )
-# local_province_data$growth_factor_in_seven_days <-
-# ((local_province_data$total_cases) / (local_province_data$total_cases_seven_days_before)
-# )
-# local_province_data$seven_day_rate <-
-# '^'(local_province_data$growth_factor_in_seven_days, 1 / 7)
-# local_province_data$seventh_perc_rate <-
-# 
-# (local_province_data$seven_day_rate - 1) * 100
-# local_province_data$cubic_rate <-
-# '^'(local_province_data$growth_factor_in_three_days, 1 / 3)
-# local_province_data$cubic_perc_rate <-
-# (local_province_data$cubic_rate - 1) * 100
-
-#local_province_rates <-
-#local_province_data[is.finite(local_province_data$cubic_perc_rate),]
-
-
-local_province_rates2 <-
+local_province_rates <-
 local_province_data[is.finite(local_province_data$seventh_perc_rate),]
 
-#province_chart <-
-#provincial_cubic_rate_chart(local_province_rates, local_province_name)
-
-#print(province_chart)
-
-
-#province_chart2 <-
-#provincial_seven_day_rate_chart(local_province_rates2, local_province_name)
-
-#print(province_chart2)
-
-combined_chart<-provincial_combined_rates_chart(local_province_rates2, local_province_name)
+combined_chart<-provincial_combined_rates_chart(local_province_rates, local_province_name)
 
 print(combined_chart)
 }
 
+rm(local_province_rates)
 rm(local_provinces)
-#rm(province_chart)
-#rm(province_chart2)
+
 } # regions loop
 
 ```
@@ -455,6 +412,7 @@ finish_time<-Sys.time()
 ---
 ```{r echo=FALSE, message=FALSE}
 finish_time<-Sys.time()
-running_time<-(finish_time-start_time)
+running_time<-as.POSIXct(finish_time)-as.POSIXct(start_time)
+
 ```
 *This document's processing time: `r running_time`*

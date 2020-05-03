@@ -9,4 +9,6 @@ csv_exports/*
 */*.html
 !README.html
 _files
-*.png
+*/*.png
+*/*.csv
+*/*.bak
