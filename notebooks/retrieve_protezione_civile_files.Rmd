@@ -46,29 +46,8 @@ dpc_covid_19_national_data_csv_full_path<-file.path(dpc_national_path, dpc_covid
 ### National
 **dpc-covid19-ita-andamento-nazionale.csv**
 ```{r echo=FALSE, message=FALSE}
-
 create_directory_if_needed(dpc_national_path)
-
-most_recent_dpc_covid_19_national_data_csv<-gsub("csv","tmp",dpc_covid_19_national_data_csv_full_path)
-previous_dpc_covid_19_national_data_csv<-gsub("csv","bak",dpc_covid_19_national_data_csv_full_path)
-
-download.file(dpc_covid_19_national_data_csv_url,most_recent_dpc_covid_19_national_data_csv)
-
-if (file.exists(previous_dpc_covid_19_national_data_csv)) {
-        file.remove(previous_dpc_covid_19_national_data_csv)
-}
-
-if (file.exists(dpc_covid_19_national_data_csv_full_path)) {
-  
-file.rename(dpc_covid_19_national_data_csv_full_path, previous_dpc_covid_19_national_data_csv)
-} 
-
-if (file.exists(most_recent_dpc_covid_19_national_data_csv)) { 
-            
-  file.rename(most_recent_dpc_covid_19_national_data_csv, dpc_covid_19_national_data_csv_full_path)
-
-}
-
+retrieve_url(dpc_covid_19_national_data_csv_url,dpc_covid_19_national_data_csv_full_path)
 ```
 
 ```{r echo=FALSE, message=FALSE}
@@ -94,26 +73,5 @@ provincial_data_csv_fname<-file.path(datasets_path,provincial_data_folder)
 ### Provinces
 **dpc-covid19-ita-province.csv**
 ```{r echo=FALSE, message=FALSE}
-
 retrieve_url(dpc_covid_19_provincial_data_csv_url,dpc_covid_19_provincial_data_csv_full_path)
-  
-# most_recent_dpc_covid_19_provincial_data_csv<-gsub("csv","tmp",dpc_covid_19_provincial_data_csv_full_path)
-# previous_dpc_covid_19_provincial_data_csv<-gsub("csv","bak",dpc_covid_19_provincial_data_csv_full_path)
-# 
-# download.file(dpc_covid_19_provincial_data_csv_url,most_recent_dpc_covid_19_provincial_data_csv)
-# 
-# if (file.exists(previous_dpc_covid_19_provincial_data_csv)) {
-#         file.remove(previous_dpc_covid_19_provincial_data_csv)
-# }
-# 
-# if (file.exists(dpc_covid_19_provincial_data_csv_full_path)) {
-#   
-# file.rename(dpc_covid_19_provincial_data_csv_full_path, previous_dpc_covid_19_provincial_data_csv)
-# } 
-# 
-# if (file.exists(most_recent_dpc_covid_19_provincial_data_csv)) { 
-#             
-#   file.rename(most_recent_dpc_covid_19_provincial_data_csv, dpc_covid_19_provincial_data_csv_full_path)
-# 
-# }
 ```
