@@ -93,6 +93,14 @@ provinces_data<-dpc_to_istat_province_name_fix(provinces_data,istat_provinces)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Density
+province_areas<-distinct(inner_join(istat_provinces, istat_area, by=c('province_name'='territory_name')))
+province_areas$density<-province_areas$population/province_areas$km2
+province_areas<-select(province_areas,"province_name","km2","density") 
+provinces_data<-inner_join(provinces_data, province_areas,by=c('denominazione_provincia'='province_name'))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 provinces_regions_key <-
   inner_join(istat_provinces,
   provinces_data,
@@ -266,6 +274,52 @@ provinces_per_capita <-
   print(prov_per_capita_latest_sel, row.names = F)
     
   rm(prov_per_capita_latest_sel)
+```
+
+### Provinces - total cases per density (population per square kilometer).
+```{r echo=FALSE, message=FALSE} 
+
+provinces_calculations$total_case_density<-provinces_calculations$totale_casi/provinces_calculations$density
+provinces_per_density <-
+  select(
+  provinces_calculations,
+  dt,
+  denominazione_provincia,
+  totale_casi,
+  density,
+  total_case_density
+  )
+  most_recent_dt <- max(provinces_per_density$dt)
+  provinces_per_density <- arrange(provinces_per_density, -total_case_density)
+  #print(most_recent_dt)
+  
+  provinces_per_density_latest <-
+  provinces_per_density[provinces_per_density$dt == most_recent_dt, ]
+  provinces_per_density_latest$pos <-
+  nrow(provinces_per_density_latest) - rank(provinces_per_density_latest$total_case_density) +
+  1
+  prov_per_density_latest_sel <-
+  arrange(provinces_per_density_latest,-total_case_density)
+  provinces_per_density_latest_sel<-select(
+  provinces_per_density_latest,
+  pos,
+  denominazione_provincia,
+#  denominazione_regione,
+  total_case_density
+  )
+  
+#  prov_per_density_latest_sel$total_case_density<-round(prov_per_density_latest_sel$total_case_density, digits=2)
+  
+  prov_per_density_latest_sel<-rounded(prov_per_density_latest_sel, c("total_case_density"), 2)
+    
+  prov_per_density_latest_sel$dt<-NULL 
+
+  prov_per_density_latest_sel<-translated_province_column_names(prov_per_density_latest_sel)    
+  prov_per_density_latest_sel<-revised_province_column_names(prov_per_density_latest_sel)
+
+  print(prov_per_density_latest_sel, row.names = F)
+    
+  rm(prov_per_density_latest_sel)
 ```
 
 ```{r echo=FALSE, message=FALSE} 
