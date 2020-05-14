@@ -12,3 +12,4 @@ _files
 */*.png
 */*.csv
 */*.bak
+!.Rproj
