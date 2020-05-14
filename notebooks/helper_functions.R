@@ -653,6 +653,14 @@ provincial_combined_rates_chart <-
     
   }
 
+provincial_combined_rates_from_dt_chart <-
+  function(df, selected_province_name, starting_dt) {
+    df <-df[df$dt >= starting_dt,]
+    
+    provincial_combined_rates_chart(df, selected_province_name)
+    
+  } 
+
 provincial_seven_day_rate_chart <-
   
   function(df, selected_province_name) {

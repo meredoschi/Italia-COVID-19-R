@@ -449,7 +449,17 @@ local_province_data[is.finite(local_province_data$seventh_perc_rate),]
 
 combined_chart<-provincial_combined_rates_chart(local_province_rates, local_province_name)
 
+num_days_in_the_past<-15 
+starting_dt<-max(local_province_rates$dt)-num_days_in_the_past 
+combined_chart_recent<-provincial_combined_rates_from_dt_chart(local_province_rates, local_province_name, starting_dt)
+
+
 print(combined_chart)
+print(paste("Shown in more detail: recent observations, for the past",num_days_in_the_past,"days"), row.names = FALSE, quote=FALSE)
+print(combined_chart_recent)
+rm(combined_chart)
+
+rm(combined_chart_recent)
 }
 
 rm(local_province_rates)
