@@ -139,6 +139,7 @@ nat_calc$positives_remaining_previous <-
 ```{r echo=FALSE}
 nat_fatalities <-
   select(nat_calc,
+  total_deceased_delta,
   total_deceased,
   total_cases,
   new_positives,
@@ -149,20 +150,25 @@ nat_fatalities <-
   nat_fatalities <-
   select(
   nat_fatalities,
-  total_deceased,
-  total_cases,
-  rate,
   dt,
   new_positives,
+  total_deceased_delta,
+  total_cases,
+  total_deceased,
+  rate,
   positives_remaining_delta
   )
   col_names <- colnames(nat_fatalities)
-  intl_col_names <- gsub("new_positives", "cases_added", col_names)
+  intl_col_names <- gsub("new_positives", "new_cases", col_names)
   intl_col_names <-
   gsub("positives_remaining_delta", "net_effect", intl_col_names)
-  intl_col_names <- gsub("rate", "fatality_rate", intl_col_names)
+ # intl_col_names <- gsub("rate", "fatality_rate", intl_col_names)
+  intl_col_names <- gsub("total_deceased_delta", "fatalities", intl_col_names)
   colnames(nat_fatalities) <- intl_col_names
-    
+  
+ nat_fatalities$dt<-as.Date(nat_fatalities$dt,format='%Y-%m-%d')
+ nat_fatalities$rate<-round(nat_fatalities$rate, digits=2)
+ 
 ```
 
 ```{r fig.height=5, fig.width=10, echo=FALSE}
@@ -188,10 +194,17 @@ chart2_title <-
   "#98234a") + ggtitle(chart2_title) + ylab("Logarithmic scale") + xlab("Date")
   
   print(chart2)
-  
-  print(nat_fatalities)
-  
+
 ```
+
+```{r echo=FALSE}  
+  nat_fatalities$dt<-format(nat_fatalities$dt,'%d/%m')  
+  print(nat_fatalities)
+```
+*Net effect = positives remaining delta (i.e. after accounting for the people discharged from hospital or healed who were in isolation)*.
+
+*Rate = mortality percent rate (total deceased / total cases).*
+
 ```{r fig.height=5, fig.width=10, echo=FALSE}
 
 chart3_title <-
@@ -279,7 +292,7 @@ chart5_title <-
 ```
 
 
-```{r fig.height=5, fig.width=10, echo=FALSE, message=FALSE}
+```{r fig.height=5, fig.width=10, echo=FALSE, message=FALSE, warning=FALSE}
 
 chart6_title <-
   paste('Active cases remaining the day before per each healed or discharged')
@@ -294,26 +307,26 @@ chart6_title <-
 ```
 
 
-```{r fig.height=5, fig.width=10, echo=FALSE, message=FALSE}
+```{r fig.height=5, fig.width=10, echo=FALSE, message=FALSE, warning=FALSE}
     
 chart7_title <-
   paste(
-  'Discharged or healed per fatality proportion',
-  format(min(national$dt), "%d %b"),
+  'Fatalities per discharged or healed proportion'
+  ,format(min(nat4$dt), "%d %b"),
   "-",
-  format(max(national$dt), "%d %b %Y")
+  format(max(nat4$dt), "%d %b %Y")
   )
   
   chart7 <-
   ggplot(nat4,
-  aes(y = total_discharged_healed_delta / total_deceased_delta, x = dt)) +
-  geom_line(color = "#7D2860") + ggtitle(chart7_title) + xlab("Date") + ylab("Higher figures are better")
+  aes(y = as.numeric(total_deceased_delta / total_discharged_healed_delta), x = dt)) +
+  geom_line(color = "#7D2860") + ggtitle(chart7_title) + xlab("Date") + ylab("Lower figures are better")
   print(chart7)
 ```
 
 
 
-```{r echo=FALSE, message=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #print(select(nat4, dt, discharged_or_healed_to_deceased_ratio))
 #summary(nat4$discharged_or_healed_to_deceased_ratio)
 ```
@@ -354,14 +367,9 @@ nat5 <-
 ```
 
 ```{r echo=FALSE, message=FALSE}
-initial_num_cases <- min(nat6$total_cases)
-national_case_backlog <-
-nat6[nat6$inactive_discharged_healed_deceased >= initial_num_cases, ]
+
 ```
 
-```{r echo=FALSE, message=FALSE}
-national_case_backlog$positives_remaining_days_trailing_ratio<-national_case_backlog$positives_remaining/as.integer(national_case_backlog$num_days_trailing)
-```
 
 
 ```{r fig.height=5, fig.width=10, echo=FALSE}
@@ -381,15 +389,38 @@ chart8_title <-
 ```
 
 ```{r echo=FALSE, message=FALSE}
-chart9_title <-
-  paste("'Backlog' - inactive (fatalities, discharged or healed) vs. cases still active")
+nat_calc<-arrange(nat_calc,dt)
+num_observations<-nrow(nat_calc) # i.e. days recorded
+first_day<-min(nat_calc$dt)
+
+nat_trailing<-select(nat_calc, dt, positives_remaining, new_positives)
+
+nat_trailing$days<-NA 
+
+for (k in 1:num_observations) {
+ 
+  current_day<-as.Date(first_day+k-1)
+  num_days_trailing <- num_days_trailing_on_dt(nat_calc,
+           current_day,
+           "positives_remaining",
+           "new_positives")
+
+    nat_trailing$days[k] <- num_days_trailing 
+    
+} 
+
+
+chart9_revised_title <-
+  paste("Positives remaining vs. new positives (retrospective calculations)")
   
-  chart9 <-
-  ggplot(data=national_case_backlog)+
-  geom_line(aes(y = num_days_trailing, x = dt),color = "darkblue") + ggtitle(chart9_title) + xlab(paste(format(min(national_case_backlog$dt), "%d %b"),
+  chart9_revised <-
+  ggplot(data=nat_trailing)+
+  geom_line(aes(y = days, x = dt),color = "darkblue") + ggtitle(chart9_revised_title) + xlab(paste(format(min(nat_trailing$dt), "%d %b"),
   "-",
-  format(max(national_case_backlog$dt), "%d %b %Y"))) + ylab("Approximate number of days behind")
-  print(chart9)
+  format(max(nat_trailing$dt), "%d %b %Y"))) + ylab("Approximate number of days in the past")
+  print(chart9_revised)
+  nat_trailing$dt<-format(nat_trailing$dt,'%d/%m')  
+  print(nat_trailing)
 ```
 
 ```{r echo=FALSE, message=FALSE}
@@ -399,7 +430,8 @@ write.csv(nat_calc, file.path(csv_exports_dir, "nat_calc.csv"))
 ```{r echo=FALSE, message=FALSE}
 finish_time<-Sys.time()
 running_time<-as.POSIXct(finish_time)-as.POSIXct(start_time)
+running_time<-paste(round(running_time, digits=3),"seconds")
 ```
-*This document's processing time: `r running_time`*
+*Processing time: `r running_time`*
 
 ---
