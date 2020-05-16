@@ -10,6 +10,8 @@ csv_exports/*
 !README.html
 _files
 */*.png
-*/*.csv
-*/*.bak
 !.Rproj
+Protezione-Civile-Dataset/COVID-19/dati-andamento-nazionale/dpc-covid19-ita-andamento-nazionale.csv
+Protezione-Civile-Dataset/COVID-19/dati-province/dpc-covid19-ita-province.csv
+Protezione-Civile-Dataset/COVID-19/dati-andamento-nazionale/dpc-covid19-ita-andamento-nazionale.bak
+Protezione-Civile-Dataset/COVID-19/dati-province/dpc-covid19-ita-province.bak
