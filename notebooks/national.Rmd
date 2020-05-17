@@ -11,6 +11,7 @@ library(dplyr)
 library(markdown)
 library(ggplot2)
 source("helper_functions.R")
+source("chart_helpers.R")
 main_dir <-
 file.path(getwd(), "..") # Project's main directory (top level)
 datasets_path <-
