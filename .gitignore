@@ -11,5 +11,6 @@ csv_exports/*
 _files
 */*.png
 */*.csv
-*/*.bak
+*.bak
 !.Rproj
+*.csv

@@ -1,6 +1,6 @@
 # Marcelo Eduardo Redoschi
 # helper functions - COVID 19 calculations
-# Last updated: 6 - May - 2020
+# Last updated: 17 - May - 2020
 
 # Draft
 num_days_trailing_on_dt <-
@@ -30,11 +30,13 @@ num_days_trailing_on_dt <-
     num_days_observed = nrow(df)
     
     while (i < num_days_observed &
-           positives_detected_subtotal < num_positives_remaining) {
+           positives_detected_subtotal <= num_positives_remaining) {
+      
+ #     print(paste("i = "),i)
       new_positives_detected_on_dt <-
         df[num_days_observed - i, new_positives_col_indx]  # on that particular day
       
-      #    print(new_positives_detected_on_dt)
+#      print(new_positives_detected_on_dt)
       
       positives_detected_subtotal <-
         positives_detected_subtotal + new_positives_detected_on_dt
@@ -50,6 +52,31 @@ num_days_trailing_on_dt <-
     
     i
   }
+
+# csv_url = url to a csv file (e.g. on a remote server)
+retrieve_url <- function(csv_url, path_to_current_file) {
+  most_recent_csv <-
+    gsub("csv", "tmp", path_to_current_file)
+  previous_csv <-
+    gsub("csv", "bak", path_to_current_file)
+  
+  download.file(csv_url, most_recent_csv)
+  
+  if (file.exists(previous_csv)) {
+    file.remove(previous_csv)
+  }
+  
+  if (file.exists(path_to_current_file)) {
+    file.rename(path_to_current_file, previous_csv)
+  }
+  
+  if (file.exists(most_recent_csv)) {
+    file.rename(most_recent_csv,
+                path_to_current_file)
+    
+  }
+  
+}
 
 # argument = the directory's full path
 create_directory_if_needed <- function(fullpath) {
@@ -655,12 +682,12 @@ provincial_combined_rates_chart <-
 
 provincial_combined_rates_from_dt_chart <-
   function(df, selected_province_name, starting_dt) {
-    df <-df[df$dt >= starting_dt,]
+    df <- df[df$dt >= starting_dt, ]
     
     provincial_combined_rates_chart(df, selected_province_name)
     
   } 
-
+  
 provincial_seven_day_rate_chart <-
   
   function(df, selected_province_name) {
