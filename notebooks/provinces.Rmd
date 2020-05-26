@@ -370,6 +370,12 @@ provinces_calculations<-provinces_calculations[provinces_calculations$dt>'2020-4
 
 ```
 
+```{r echo=FALSE, message=FALSE}
+provinces_calculations_most_recent_dt<-provinces_calculations[provinces_calculations$dt==most_recent_dt,]
+histogram_title<-paste("Provinces histogram - growth in new cases",most_recent_dt)
+ggplot(provinces_calculations_most_recent_dt, aes(cubic_perc_rate))+geom_histogram(color="yellow",fill="#5a80b2")+labs(title=histogram_title, x="Weighted average percent rate for previous three days",y = "Number of provinces")
+```
+
 ```{r  fig.height=5, fig.width=10, echo=FALSE, message=FALSE}
 
 for (i in 1:nrow(italian_regions)) {
