@@ -429,7 +429,7 @@ chart9_revised_title <-
 
 chart10_title <-
   paste(
-  'Positives remaining (daily variation)',
+  'Positives remaining (percent delta)',
   format(min(national$dt), "%d %b"),
   "-",
   format(max(national$dt), "%d %b %Y")
