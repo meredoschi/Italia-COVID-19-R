@@ -394,8 +394,9 @@ nat_calc<-arrange(nat_calc,dt)
 num_observations<-nrow(nat_calc) # i.e. days recorded
 first_day<-min(nat_calc$dt)
 
-nat_trailing<-select(nat_calc, dt, positives_remaining, new_positives)
+nat_trailing<-select(nat_calc, dt, positives_remaining, positives_remaining_percent_delta)
 
+nat_trailing$positives_remaining_percent_delta<-round(nat_trailing$positives_remaining_percent_delta, digits=3)
 nat_trailing$days<-NA 
 
 for (k in 1:num_observations) {
@@ -440,7 +441,6 @@ chart10_title <-
   "#2DA8B3") + ggtitle(chart10_title) + xlab("Date") +
   ylab("% variation from the previous day")
   print(chart10)
-  
 ```
 
 ```{r echo=FALSE, message=FALSE}
