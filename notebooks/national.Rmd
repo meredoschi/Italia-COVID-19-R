@@ -424,6 +424,25 @@ chart9_revised_title <-
   print(nat_trailing)
 ```
 
+```{r fig.height=5, fig.width=10, echo=FALSE}
+
+chart10_title <-
+  paste(
+  'Positives remaining (daily variation)',
+  format(min(national$dt), "%d %b"),
+  "-",
+  format(max(national$dt), "%d %b %Y")
+  )
+  
+  chart10 <-
+  ggplot(nat_calc,
+  aes(y = positives_remaining_percent_delta, x = dt)) + geom_line(color =
+  "#2DA8B3") + ggtitle(chart10_title) + xlab("Date") +
+  ylab("% variation from the previous day")
+  print(chart10)
+  
+```
+
 ```{r echo=FALSE, message=FALSE}
 write.csv(nat_calc, file.path(csv_exports_dir, "nat_calc.csv"))
 ```
