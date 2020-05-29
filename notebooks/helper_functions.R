@@ -137,6 +137,7 @@ backlog_dt  <- function(df, n) {
   min(temp$dt)
 }
 
+
 # df = dpc_provinces (from the Protezione Civile dataset)
 trentino_sudtirol_fix <-
   function(df, trentino_sudtirol_region_name) {
@@ -281,13 +282,14 @@ dpc_to_istat_province_name_fix <- function(df, istat_provinces_df) {
   
   df$denominazione_provincia <-
     as.character(df$denominazione_provincia)
+  
   for (i in 1:length(province_names_to_adjust)) {
     province_name_initials <-
       substring(province_names_to_adjust[i], 1, 5)
     record_to_read_indx <-
-      grep(province_name_initials, istat_provinces$province_name)
+      grep(province_name_initials, istat_provinces_df$province_name)
     formal_province_name <-
-      as.character(istat_provinces[record_to_read_indx, ]$province_name)
+      as.character(istat_provinces_df[record_to_read_indx, ]$province_name)
     record_to_change_indx <-
       grep(province_name_initials,
            df$denominazione_provincia)
@@ -316,6 +318,16 @@ consistent_region_names <- function(istat_df, dpc_df) {
     dpc_df,
     by = c('region_name' = 'denominazione_regione')
   ))$region_name
+}
+
+# df: dpc_covid19_ita_provinces
+forli_cesena_accent_fix <- function(df) {
+  df$denominazione_provincia_fixed <-
+    gsub('Forl“-Cesena', 'Forlì-Cesena', df$denominazione_provincia)
+  df$denominazione_provincia <- df$denominazione_provincia_fixed
+  df$denominazione_provincia_fixed <- NULL
+  df
+  
 }
 
 consistent_province_names <- function(istat_df, dpc_df) {

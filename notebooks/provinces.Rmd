@@ -86,10 +86,12 @@ colnames(istat_area)<-col_names
 
 provincial_data_csv_fname<-file.path(datasets_path,"dati-province","dpc-covid19-ita-province.csv")
 dpc_covid19_ita_provinces<-import_csv(provincial_data_csv_fname)
+dpc_covid19_ita_provinces<-forli_cesena_accent_fix(dpc_covid19_ita_provinces)
 
 provinces_data<-distinct(filter_extraneous_rows(dpc_covid19_ita_provinces))
 provinces_data<-trentino_sudtirol_fix(provinces_data,"Trentino Alto Adige / Südtirol")
 provinces_data<-fix_region_names(istat_regions, provinces_data)
+
 provinces_data<-dpc_to_istat_province_name_fix(provinces_data,istat_provinces)
 ```
 
