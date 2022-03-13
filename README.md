@@ -1,36 +1,13 @@
 ## README (Italia-COVID-19-R)
 
---- 
-
-#### I think of this repository as a *leaner* branch of [https://github.com/meredoschi/Italia-COVID-19](https://github.com/meredoschi/Italia-COVID-19).
-
-##### Practically the same, but without the html notebook files and some other details.   
-
---- 
-
 ### I. Introduction
 
-This repository contains some of my own personal, calculations, regarding the current COVID-10 epidemic in Italy.  
+This repository contains some of my own personal calculations regarding the COVID-19 epidemic in Italy.  
 
-I do hope these notebooks (which include the ability to produce charts) and the possible insights may be useful somehow, especially if you are in a professional capacity in this veritable fight against the disease. 
-
-*I am not an epidemiologist, just a simple mathematician.*
+It is more compact than the original [https://github.com/meredoschi/Italia-COVID-19](https://github.com/meredoschi/Italia-COVID-19), which included html rendered files with many charts.
+It is therefore assumed that users will have the RStudio environment installed, in order to be able to generate the html files themselves.
 
 ### II. About the project directories
-
-#### notebooks
-
-**Source code in R** 
-
-- [national](notebooks/national.Rmd) 
-
-- [provincial](notebooks/provinces.Rmd)
-
-- [helper_functions](notebooks/helper_functions.R)
-
-- [retrieve_protezione_civile_files](notebooks/retrieve_protezione_civile_files.Rmd)
-
-     *Should be run at least once a day, to try and retrieve the Protezione Civile updates (i.e. two CSV files).*     
 
 #### csv_input 
 
@@ -44,15 +21,36 @@ For questions or further information regarding the DPC project repository, kindl
 
 *In other words, I am not affiliated with ISTAT or the DPC.*   
 
-##### Others folders/miscellaneous 
+#### Notebooks
 
-- csv_exports 
+- [national_2022](notebooks/national_2022.Rmd) 
 
-- optional_pre_processing
+   *This code was revised in part, so it should run faster than the original national notebook.*  
 
-    *Included for completeness.* 
+   The **positives remaining (percent delta)** graph is a good indication of current trends and past waves. 
+
+- [provinces](notebooks/provinces.Rmd)
+
+   Similarly, I watch for changes in the **provinces histogram - growth in new cases **. 
+
+- [national](notebooks/national.Rmd) 
+
+   *Original notebook, includes the retrospective calculations and other information not yet in the 2022 version*.
+
+- [retrieve_protezione_civile_files](notebooks/retrieve_protezione_civile_files.Rmd)
+ 
+   Retrieves the latest daily csv data from the *Protezione Civile*. 
+   
+- [helper_functions](notebooks/helper_functions.R)
+   
+#### Other folders (mentioned for completeness) 
+
+##### csv_exports 
+
+##### optional_pre_processing
 
 ---
+
 
 ### III. Technical installation instructions 
 
@@ -82,19 +80,29 @@ For questions or further information regarding the DPC project repository, kindl
 
    - Start RStudio and open the project.
 
+3. Within RStudio, navigate to the notebooks directory and run:
+
+   - [retrieve_protezione_civile_files](notebooks/retrieve_protezione_civile_files.Rmd)
+   *Generally, once a day is enough.  Updates are published in the evening, Italian time.*
+
+   - [national_2022](notebooks/national_2022.Rmd) 
+
+   - [provinces](notebooks/provinces.Rmd)
+
+   Optional: generate html or PDF files for the above notebooks.
+   
 --- 
 
-### IV. About my development environment 
+#### Current environment information 
 
-#### For interested scientists, doctors and other professionals.
+- R language version: 4.1.2 (2021-11-01)
+- RStudio version: 1.4.1717
+- Git version: 2.25.1
+- Operating system: Linux 64 bits
 
-- R language version 3.6.3 (2020-02-29)
-- RStudio version 1.1.463
-- Git version 2.19.1
-- Operation system details:  OS X 10.11.6
-  
 ---
 
 **Marcelo Eduardo Redoschi**
 
-*This page last updated: 1/5/2020*
+*This page last updated: 13/3/2022*
+´

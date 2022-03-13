@@ -41,10 +41,13 @@ national_csv_fname <-
   national <- dpc_covid19_ita_national
 ```
 
-```{r echo=FALSE, message=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 national<-translated_national_column_names(dpc_covid19_ita_national)
 national$dt<-as.Date(ymd_hms(national$data))
 national$data<-NULL 
+# Revised March 2021
+#national<-national[national$dt>='2021-7-1',]
+
 nat_expanded<-national
 indicators<-c("total_cases","intensive_care","hospitalized_with_symptoms","home_isolation","total_discharged_healed","total_deceased","tests","new_positives","positives_remaining")
 
@@ -135,6 +138,10 @@ nat_calc$positives_remaining_previous <-
   nat_calc$total_discharged_healed_delta / nat_calc$positives_remaining_previous *
   100
   
+```
+
+```{r echo=FALSE}
+nat_calc<-nat_calc[-1,]
 ```
 
 ```{r echo=FALSE}
@@ -333,7 +340,7 @@ chart7_title <-
 ```
 
 
-```{r echo=FALSE, message=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 nat5 <-
   select(
   nat_calc,
@@ -374,18 +381,42 @@ nat5 <-
 
 
 ```{r fig.height=5, fig.width=10, echo=FALSE}
-chart8_title <-
-  paste('Intensive care (in red), hospitalized with symptoms and home isolation daily changes',
-  format(min(national$dt), "%d %b"),
+chart8i_title <-
+#  paste('Intensive care (in red), hospitalized with symptoms and home isolation daily changes',
+  paste('Intensive care (in red) daily changes', format(min(national$dt), "%d %b"),
   "-",
   format(max(national$dt), "%d %b %Y")
   )
   
-  chart8 <-
-  ggplot(data=deltas_nat_labelled) + geom_line(aes(y = intensive_care_delta, x = dt),color = "red") + geom_line(aes(y = home_isolation_delta, x = dt),color = "orange") + geom_line(aes(y = hospitalized_with_symptoms_delta, x = dt),color = "yellow", size=2) + 
-   ggtitle(chart8_title) + xlab("Date") + ylab("people")
+  chart8i <-
+  ggplot(data=deltas_nat_labelled) + geom_line(aes(y = intensive_care_delta, x = dt),color = "red") +
+   ggtitle(chart8i_title) + xlab("Date") + ylab("people")
 
-  print(chart8)
+#    chart8 <-
+#  ggplot(data=deltas_nat_labelled) + geom_line(aes(y = intensive_care_delta, x = dt),color = "red") + geom_line(aes(y = home_isolation_delta, x = dt),color = "orange") + geom_line(aes(y = hospitalized_with_symptoms_delta, x = dt),color = "yellow", size=2) + 
+#   ggtitle(chart8_title) + xlab("Date") + ylab("people")
+
+  print(chart8i)
+  
+```
+
+```{r fig.height=5, fig.width=10, echo=FALSE}
+chart8i2_title <-
+#  paste('Intensive care (in red), hospitalized with symptoms and home isolation daily changes',
+  paste('Intensive care per new positives', format(min(national$dt), "%d %b"),
+  "-",
+  format(max(national$dt), "%d %b %Y")
+  )
+  
+  chart8i2 <-
+  ggplot(data=nat_calc) + geom_line(aes(y = intensive_care_delta/new_positives*1000, x = dt),color = "brown") +
+   ggtitle(chart8i_title) + xlab("Date") + ylab("proportion")
+
+#    chart8 <-
+#  ggplot(data=deltas_nat_labelled) + geom_line(aes(y = intensive_care_delta, x = dt),color = "red") + geom_line(aes(y = home_isolation_delta, x = dt),color = "orange") + geom_line(aes(y = hospitalized_with_symptoms_delta, x = dt),color = "yellow", size=2) + 
+#   ggtitle(chart8_title) + xlab("Date") + ylab("people")
+
+  print(chart8i2)
   
 ```
 
@@ -443,15 +474,49 @@ chart10_title <-
   print(chart10)
 ```
 
+```{r}
+national0<-national %>% arrange(dt) %>% select(tests, hospitalized_with_symptoms,dt)
+
+national1<-head(national0,-1)
+
+earliest_dt<-as.character(min(national0$dt))
+
+colnames(national1)<-c('total_tests_previous_day','total_hospitalized_with_symptoms_previous_day','dt')
+national1$dt<-national1$dt+1
+national1<-rbind(c(NA,NA,earliest_dt),national1)
+
+
+national11<-inner_join(national0, national1) %>% tail(-1)
+national11$total_tests_previous_day<-as.integer(national11$total_tests_previous_day)
+national11$total_hospitalized_with_symptoms_previous_day<-as.integer(national11$total_hospitalized_with_symptoms_previous_day)
+
+national11$tests_on_dt<-national11$tests-(national11$total_tests_previous_day)
+national11$hospitalized_with_symptoms_on_dt<-national11$hospitalized_with_symptoms-national11$total_hospitalized_with_symptoms_previous_day
+#head(national11)
+```
+```{r fig.height=5, fig.width=10, echo=FALSE, message=FALSE, warning=FALSE}
+
+#require(ggplot2)
+chart11_title <-
+  paste('Newly hospitalized with symptoms')
+  
+  chart11 <-
+  ggplot(national11,
+  aes(y = hospitalized_with_symptoms_on_dt , x =
+  dt)) + geom_line(color = "orange") + ggtitle(chart11_title) +
+  xlab(paste(format(min(national11$dt), "%d %b"), "-", format(max(national11$dt), "%d %b %Y"))) +
+  ylab("Daily variation (number of patients)")
+  print(chart11)
+```
+
 ```{r echo=FALSE, message=FALSE}
 write.csv(nat_calc, file.path(csv_exports_dir, "nat_calc.csv"))
 ```
----
-```{r echo=FALSE, message=FALSE}
-finish_time<-Sys.time()
-running_time<-as.POSIXct(finish_time)-as.POSIXct(start_time)
-running_time<-paste(round(running_time, digits=3),"seconds")
-```
-*Processing time: `r running_time`*
 
----
+```{r echo=FALSE, message=FALSE}
+#finish_time<-Sys.time()
+#running_time<-as.POSIXct(finish_time)-as.POSIXct(start_time)
+#running_time<-paste(round(running_time, digits=3),"seconds")
+#*Processing time: `r running_time`*
+
+```

@@ -1,0 +1,317 @@
+---
+title: "National calculations and charts - Italy - COVID-19 Epidemic - 2022 version"
+author: "Marcelo Eduardo Redoschi"
+output: html_document
+---
+
+```{r echo=FALSE, message=FALSE}
+library(readr)
+library(lubridate)
+library(dplyr)
+library(markdown)
+library(ggplot2)
+source("helper_functions.R")
+source("chart_helpers.R")
+main_dir <-
+file.path(getwd(), "..") # Project's main directory (top level)
+datasets_path <-
+file.path(main_dir, "Protezione-Civile-Dataset", "COVID-19")
+csv_exports_dir <- file.path(main_dir, "csv_exports") 
+if (!dir.exists(csv_exports_dir)) {dir.create(csv_exports_dir)}
+```
+
+```{r echo=FALSE, message=FALSE}
+start_time<-Sys.time()
+```
+
+**`r format(start_time, "%a %d %b %Y %X %Z")`**
+
+#### Based on the Protezione Civile Dataset
+*Source: dpc-covid19-ita-andamento-nazionale.csv, own calculations*
+
+```{r echo=FALSE, message=FALSE}
+national_csv_fname <-
+  file.path(
+  datasets_path,
+  "dati-andamento-nazionale",
+  "dpc-covid19-ita-andamento-nazionale.csv"
+  )
+  dpc_covid19_ita_national <-
+  import_csv(national_csv_fname)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
+#national_v2<-translated_national_column_names(dpc_covid19_ita_national)
+
+national<-dpc_covid19_ita_national %>% rename("dt"="data","hospitalized_with_symptoms"="ricoverati_con_sintomi","intensive_care"="terapia_intensiva","hospitalized_total"="totale_ospedalizzati","home_isolation"="isolamento_domiciliare","positives_remaining"="totale_positivi","new_positives"="nuovi_positivi","total_discharged_healed"="dimessi_guariti","total_deceased"="deceduti","total_cases"="totale_casi","nation"="stato","notes"="note","tests"="tamponi","positives_remaining_delta"="variazione_totale_positivi","intensive_care_admissions"="ingressi_terapia_intensiva","cases_tested"="casi_testati")
+national$dt<-ymd(as.Date(ymd_hms(national$dt)))
+national<-arrange(national,desc(dt))
+columns_to_remove<-c('nation','casi_da_sospetto_diagnostico','totale_positivi_test_molecolare','tamponi_test_antigenico_rapido','casi_da_screening','tamponi_test_molecolare','totale_positivi_test_antigenico_rapido','note_test','note_casi')
+
+national<-select(national,-all_of(columns_to_remove))
+```
+
+```{r echo=FALSE}
+#national<-national[national$dt>'2021-6-15',]
+```
+
+```{r echo=FALSE}
+national_previous_day<-tail(national,-1) %>% arrange(desc(dt))
+colnames(national_previous_day)<-paste("previous_day",colnames(national),sep='_')
+national_previous_day$dt<-national_previous_day$previous_day_dt+1
+```
+
+```{r echo=FALSE}
+nat_calc<-inner_join(national, national_previous_day, by='dt')
+
+indicators<-c("total_cases","intensive_care","hospitalized_with_symptoms","home_isolation","total_discharged_healed","total_deceased","tests","new_positives","positives_remaining")
+```
+
+```{r echo=FALSE}
+nat_calc$total_cases_delta<-nat_calc$total_cases-nat_calc$previous_day_total_cases
+nat_calc$intensive_care_delta<-nat_calc$intensive_care-nat_calc$previous_day_intensive_care
+nat_calc$hospitalized_with_symptoms_delta<-nat_calc$hospitalized_with_symptoms-nat_calc$previous_day_hospitalized_with_symptoms
+nat_calc$home_isolation_delta<-nat_calc$home_isolation-nat_calc$previous_day_home_isolation
+nat_calc$discharged_healed_delta<-nat_calc$total_discharged_healed-nat_calc$previous_day_total_discharged_healed
+nat_calc$total_deceased_delta<-nat_calc$total_deceased-nat_calc$previous_day_total_deceased
+nat_calc$tests_delta<-nat_calc$tests-nat_calc$previous_day_tests
+nat_calc$new_positives_delta<-nat_calc$new_positives-nat_calc$previous_day_new_positives
+nat_calc$positives_remaining_delta<-nat_calc$positives_remaining-nat_calc$previous_day_positives_remaining
+```
+
+```{r echo=FALSE}
+
+nat_calc$tests_per_new_positives <-
+nat_calc$tests_delta / nat_calc$new_positives
+nat_calc$total_tests_per_cases_ratio <-
+nat_calc$tests / nat_calc$total_cases
+```
+
+```{r fig.height=5, fig.width=10, echo=FALSE}
+chart1_title <-
+  paste('Total cases', format(min(national$dt), "%d %b %Y"), "-", format(max(national$dt), "%d %b %Y"))
+  
+  chart1 <-
+  ggplot(national, aes(y = log10(total_cases), x = dt)) + geom_line(color =
+  "#40B35A", linetype = 2) + ggtitle(chart1_title) + ylab("Logarithmic scale") +
+  xlab("Date")
+  
+  print(chart1)
+```
+
+```{r fig.height=5, fig.width=10, echo=FALSE}
+chart2_title <-
+  paste('Total fatalities',
+  format(min(national$dt), "%d %b %Y"),
+  "-",
+  format(max(national$dt), "%d %b %Y"))
+  
+  chart2 <-
+  ggplot(nat_calc, aes(y = log10(total_deceased), x = dt)) + geom_line(color =
+  "#98234a") + ggtitle(chart2_title) + ylab("Logarithmic scale") + xlab("Date")
+  
+  print(chart2)
+
+```
+```{r fig.height=5, fig.width=10, echo=FALSE}
+chart3_title <-
+  paste('Daily fatalities',
+  format(min(national$dt), "%d %b %Y"),
+  "-",
+  format(max(national$dt), "%d %b %Y"))
+
+  
+  chart3 <-
+  ggplot(nat_calc, aes(y = total_deceased_delta, x = dt)) + geom_line(color =
+  "#98234a") + ggtitle(chart3_title) + ylab("Deceased") + xlab("Date")
+  
+  print(chart3)
+
+```
+
+```{r fig.height=5, fig.width=10, echo=FALSE}
+
+chart3_supplemental_title <-
+  paste('Positives remaining delta (after fatalities and discharged or healed)',
+  format(min(national$dt), "%d %b %Y"),
+  "-",
+  format(max(national$dt), "%d %b %Y")
+  )
+  
+  chart3_supplemental <-
+  ggplot(data=nat_calc)+ geom_line(aes(y = positives_remaining_delta, x = dt),color =
+  "#4FA006") + ggtitle(chart3_supplemental_title) + xlab("Date") +
+  ylab("people")
+  print(chart3_supplemental)
+  
+```
+```{r fig.height=5, fig.width=10, echo=FALSE}
+
+chart3_supplemental2_title <-
+  paste('Fatalities (scaled 1000 times) versus positives remaining',
+  format(min(national$dt), "%d %b %Y"),
+  "-",
+  format(max(national$dt), "%d %b %Y")
+  )
+  
+  chart3_supplemental2 <-
+  ggplot(data=nat_calc)+ geom_line(aes(y = positives_remaining, x = dt),color =
+  "#3F2251") + ggtitle(chart3_supplemental2_title) + xlab("Date") +
+  ylab("people")+ geom_line(aes(y = total_deceased_delta*1000, x = dt),color =
+  "#98234a") 
+  print(chart3_supplemental2)
+  
+```
+```{r fig.height=5, fig.width=10, echo=FALSE}
+
+chart3_supplemental3_title <-
+  paste('Remaining positives logarithm (after fatalities and discharged or healed)',
+  format(min(national$dt), "%d %b %Y"),
+  "-",
+  format(max(national$dt), "%d %b %Y")
+  )
+  
+  chart3_supplemental3 <-
+  ggplot(data=nat_calc)+ geom_line(aes(y = log10(positives_remaining), x = dt),color =
+  "blue") + ggtitle(chart3_supplemental3_title) + xlab("Date") +
+  ylab("10^n")
+  
+  print(chart3_supplemental3)
+  
+```
+
+```{r fig.height=5, fig.width=10, echo=FALSE} 
+chart4_title <-
+  paste(
+  'Fatalities per new positives on the previous day',
+  format(min(national$dt) + 1, "%d %b %Y"),
+  "-",
+  format(max(national$dt), "%d %b %Y")
+  )
+  
+  chart4 <-
+  ggplot(nat_calc, aes(y = total_deceased_delta/previous_day_new_positives*1000 , x = dt)) +
+  geom_line(color = "red", linetype = 2) + ggtitle(chart4_title) + xlab(paste(format(min(nat_calc$dt), "%d %b %Y"), "-", format(max(nat_calc$dt), "%d %b %Y"))) +
+  ylab("‰")
+  print(chart4)
+```
+
+```{r fig.height=5, fig.width=10, echo=FALSE}
+    
+chart5_title <-
+  paste(
+  'Discharged or healed per positive cases on the previous day',
+  format(min(national$dt) + 1, "%d %b %Y"),
+  "-",
+  format(max(national$dt), "%d %b %Y")
+  )
+  
+  
+  chart5 <-
+  ggplot(nat_calc,
+  aes(y = discharged_healed_delta/previous_day_positives_remaining*100, x = dt)) + geom_line(color =
+  "green") + ggtitle(chart5_title) + xlab("Date") + ylab("Proportion")
+  print(chart5)
+```
+
+```{r fig.height=5, fig.width=10, echo=FALSE, message=FALSE, warning=FALSE}
+
+chart6_title <-
+  paste('Active cases remaining the day before per each healed or discharged')
+  
+  chart6 <-
+  ggplot(nat_calc,
+  aes(y = previous_day_positives_remaining / discharged_healed_delta, x =
+  dt)) + geom_line(color = "purple", linetype = 5) + ggtitle(chart6_title) +
+  xlab(paste(format(min(national$dt) + 1, "%d %b %Y"), "-", format(max(national$dt), "%d %b %Y"))) +
+  ylab("Proportion (smaller numbers are better)")
+  print(chart6)
+```
+
+```{r fig.height=5, fig.width=10, echo=FALSE, message=FALSE, warning=FALSE}
+    
+chart7_title <-
+  paste(
+  'Fatalities per discharged or healed proportion'
+  ,format(min(nat_calc$dt), "%d %b %Y"),
+  "-",
+  format(max(nat_calc$dt), "%d %b %Y")
+  )
+  
+  chart7 <-
+  ggplot(nat_calc,
+  aes(y = as.numeric(total_deceased_delta / discharged_healed_delta), x = dt)) +
+  geom_line(color = "#7D2860") + ggtitle(chart7_title) + xlab("Date") + ylab("Lower figures are better")
+  print(chart7)
+```
+
+```{r fig.height=5, fig.width=10, echo=FALSE}
+chart8i_title <-
+  paste('Intensive care (in red) daily changes', format(min(nat_calc$dt), "%d %b %Y"),
+  "-",
+  format(max(nat_calc$dt), "%d %b %Y")
+  )
+  
+  chart8i <-
+  ggplot(data=nat_calc) + geom_line(aes(y = intensive_care_delta, x = dt),color = "red") +
+   ggtitle(chart8i_title) + xlab("Date") + ylab("people")
+
+  print(chart8i)
+  
+```
+
+```{r fig.height=5, fig.width=10, echo=FALSE}
+chart8i2_title <-
+#  paste('Intensive care (in red), hospitalized with symptoms and home isolation daily changes',
+  paste('Intensive care per new positives', format(min(national$dt), "%d %b"),
+  "-",
+  format(max(national$dt), "%d %b %Y")
+  )
+  
+  chart8i2 <-
+  ggplot(data=nat_calc) + geom_line(aes(y = intensive_care_delta/new_positives*1000, x = dt),color = "orange") +
+   ggtitle(chart8i_title) + xlab("Date") + ylab("‰")
+
+#    chart8 <-
+#  ggplot(data=deltas_nat_labelled) + geom_line(aes(y = intensive_care_delta, x = dt),color = "red") + geom_line(aes(y = home_isolation_delta, x = dt),color = "orange") + geom_line(aes(y = hospitalized_with_symptoms_delta, x = dt),color = "yellow", size=2) + 
+#   ggtitle(chart8_title) + xlab("Date") + ylab("people")
+
+  print(chart8i2)
+  
+```
+
+```{r fig.height=5, fig.width=10, echo=FALSE}
+
+chart10_title <-
+  paste(
+  'Positives remaining (percent delta)',
+  format(min(national$dt), "%d %b %Y"),
+  "-",
+  format(max(national$dt), "%d %b %Y")
+  )
+  
+  chart10 <-
+  ggplot(nat_calc,
+  aes(y = (positives_remaining-previous_day_positives_remaining)/positives_remaining*100, x = dt)) + geom_line(color =
+  "#2DA8B3") + ggtitle(chart10_title) + xlab("Date") +
+  ylab("% variation from the previous day")
+  print(chart10)
+```
+```{r fig.height=5, fig.width=10, echo=FALSE, message=FALSE, warning=FALSE}
+
+#require(ggplot2)
+chart11_title <-
+  paste('Newly hospitalized with symptoms')
+  
+  chart11 <-
+  ggplot(nat_calc,
+  aes(y = hospitalized_with_symptoms_delta , x =
+  dt)) + geom_line(color = "orange") + ggtitle(chart11_title) +
+  xlab(paste(format(min(nat_calc$dt), "%d %b %Y"), "-", format(max(nat_calc$dt), "%d %b %Y"))) +
+  ylab("Daily variation (number of patients)")
+  print(chart11)
+```
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#print(select(nat4, dt, discharged_or_healed_to_deceased_ratio))
+#summary(nat4$discharged_or_healed_to_deceased_ratio)
+```

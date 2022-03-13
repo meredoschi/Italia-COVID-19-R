@@ -89,10 +89,25 @@ dpc_covid19_ita_provinces<-import_csv(provincial_data_csv_fname)
 dpc_covid19_ita_provinces<-forli_cesena_accent_fix(dpc_covid19_ita_provinces)
 
 provinces_data<-distinct(filter_extraneous_rows(dpc_covid19_ita_provinces))
-provinces_data<-trentino_sudtirol_fix(provinces_data,"Trentino Alto Adige / Südtirol")
-provinces_data<-fix_region_names(istat_regions, provinces_data)
+#provinces_data<-trentino_sudtirol_fix(provinces_data,"Trentino Alto Adige / Südtirol")
 
-provinces_data<-dpc_to_istat_province_name_fix(provinces_data,istat_provinces)
+provinces_data$denominazione_regione<- gsub("Friuli Venezia Giulia",'Friuli-Venezia Giulia',provinces_data$denominazione_regione)
+
+provinces_data$denominazione_regione<- gsub("P.A. Bolzano","Trentino Alto Adige / Südtirol",provinces_data$denominazione_regione)
+
+provinces_data$denominazione_regione<- gsub("P.A. Trento","Trentino Alto Adige / Südtirol",provinces_data$denominazione_regione)
+
+provinces_data$denominazione_regione<- gsub("Valle d'Aosta","Valle d'Aosta / Vallée d'Aoste",provinces_data$denominazione_regione)
+
+# setdiff(sort(unique(provinces_data$denominazione_provincia)),sort(istat_provinces$province_name))
+# [1] "Aosta"                              "Bolzano"                            "Fuori Regione / Provincia Autonoma" "Massa Carrara"  
+#provinces_data$denominazione_regione<-fix_region_names(istat_regions, provinces_data)
+
+provinces_data$denominazione_provincia<- gsub("Aosta","Valle d'Aosta / Vallée d'Aoste",provinces_data$denominazione_provincia)
+provinces_data$denominazione_provincia<- gsub("Bolzano","Bolzano / Bozen",provinces_data$denominazione_provincia)
+provinces_data$denominazione_provincia<- gsub("Massa Carrara","Massa-Carrara",provinces_data$denominazione_provincia)
+
+#provinces_data<-dpc_to_istat_province_name_fix(provinces_data,istat_provinces)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -144,6 +159,8 @@ provinces_data <-
 
 ```{r echo=FALSE, message=FALSE}
 provinces_calculations <- provinces_data
+
+provinces_calculations <-provinces_calculations[provinces_calculations$dt>'2021-1-1',]
 
 current_total_cases <-
 total_cases_on_dt(provinces_data, days_before(provinces_data, 0))
@@ -458,7 +475,7 @@ local_province_data[is.finite(local_province_data$seventh_perc_rate),]
 
 combined_chart<-provincial_combined_rates_chart(local_province_rates, local_province_name)
 
-num_days_in_the_past<-15 
+num_days_in_the_past<-30 
 starting_dt<-max(local_province_rates$dt)-num_days_in_the_past 
 combined_chart_recent<-provincial_combined_rates_from_dt_chart(local_province_rates, local_province_name, starting_dt)
 

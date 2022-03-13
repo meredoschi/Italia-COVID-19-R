@@ -139,29 +139,29 @@ backlog_dt  <- function(df, n) {
 
 
 # df = dpc_provinces (from the Protezione Civile dataset)
-trentino_sudtirol_fix <-
-  function(df, trentino_sudtirol_region_name) {
-    df$denominazione_regione <- as.character(df$denominazione_regione)
-    
-    trentino_sudtirol_province_rows <-
-      grep("Trento|Bolzano", df$denominazione_provincia)
-    
-    matching_rows <- df[(trentino_sudtirol_province_rows),]
-    
-    for (i in 1:nrow(matching_rows)) {
-      matching_province <- matching_rows[i,]
-      
-      df[df$codice_provincia == matching_province$codice_provincia,]$denominazione_regione <-
-        trentino_sudtirol_region_name
-      
-    }
-    
-    # Convert column back to factor, after fixing it
-    df$denominazione_regione <- as.factor(df$denominazione_regione)
-    
-    df
-  }
-
+# trentino_sudtirol_fix <-
+#   function(df, trentino_sudtirol_region_name) {
+#     df$denominazione_regione <- as.character(df$denominazione_regione)
+#     
+#     trentino_sudtirol_province_rows <-
+#       grep("Trento|Bolzano", df$denominazione_provincia)
+#     
+#     matching_rows <- df[(trentino_sudtirol_province_rows),]
+#     
+#     for (i in 1:nrow(matching_rows)) {
+#       matching_province <- matching_rows[i,]
+#       
+#       df[df$codice_provincia == matching_province$codice_provincia,]$denominazione_regione <-
+#         trentino_sudtirol_region_name
+#       
+#     }
+#     
+#     # Convert column back to factor, after fixing it
+#     df$denominazione_regione <- as.factor(df$denominazione_regione)
+#     
+#     df
+#   }
+# 
 # df = provinces
 provinces_regional_territory_code_fix <- function(df) {
   df$regional_territory_code <-
@@ -273,38 +273,38 @@ rounded <- function(df, column_names_to_round, n) {
 #df = provinces_data (i.e. with province names as used by the dpc)
 # istat_provinces = Province names following ISTAT
 
-dpc_to_istat_province_name_fix <- function(df, istat_provinces_df) {
-  dpc_provinces <-
-    dpc_province_names(df) # makes use of helper function
-  province_names_to_adjust <-
-    setdiff(dpc_provinces,
-            as.character(istat_provinces_df$province_name))
-  
-  df$denominazione_provincia <-
-    as.character(df$denominazione_provincia)
-  
-  for (i in 1:length(province_names_to_adjust)) {
-    province_name_initials <-
-      substring(province_names_to_adjust[i], 1, 5)
-    record_to_read_indx <-
-      grep(province_name_initials, istat_provinces_df$province_name)
-    formal_province_name <-
-      as.character(istat_provinces_df[record_to_read_indx, ]$province_name)
-    record_to_change_indx <-
-      grep(province_name_initials,
-           df$denominazione_provincia)
-    df$denominazione_provincia[record_to_change_indx] <-
-      as.character(formal_province_name) # from the ISTAT dataset
-    
-  }
-  
-  # convert province name (denominazione_provincia) column back to factor
-  df$denominazione_provincia <-
-    as.factor(df$denominazione_provincia)
-  
-  df
-  
-}
+# dpc_to_istat_province_name_fix <- function(df, istat_provinces_df) {
+#   dpc_provinces <-
+#     dpc_province_names(df) # makes use of helper function
+#   province_names_to_adjust <-
+#     setdiff(dpc_provinces,
+#             as.character(istat_provinces_df$province_name))
+#   
+#   df$denominazione_provincia <-
+#     as.character(df$denominazione_provincia)
+#   
+#   for (i in 1:length(province_names_to_adjust)) {
+#     province_name_initials <-
+#       substring(province_names_to_adjust[i], 1, 5)
+#     record_to_read_indx <-
+#       grep(province_name_initials, istat_provinces_df$province_name)
+#     formal_province_name <-
+#       as.character(istat_provinces_df[record_to_read_indx, ]$province_name)
+#     record_to_change_indx <-
+#       grep(province_name_initials,
+#            df$denominazione_provincia)
+#     df$denominazione_provincia[record_to_change_indx] <-
+#       as.character(formal_province_name) # from the ISTAT dataset
+#     
+#   }
+#   
+#   # convert province name (denominazione_provincia) column back to factor
+#   df$denominazione_provincia <-
+#     as.factor(df$denominazione_provincia)
+#   
+#   df
+#   
+# }
 
 
 consistent_region_names <- function(istat_df, dpc_df) {

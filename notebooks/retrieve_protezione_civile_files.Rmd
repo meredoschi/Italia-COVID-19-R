@@ -1,8 +1,8 @@
 ---
-title: "Notebook to retrieve the Protezione Civile csv files directly"
+html_document: default
 author: "Marcelo Eduardo Redoschi"
 date: "3-May-2020"
-html_document: default
+title: "Notebook to retrieve the Protezione Civile csv files directly"
 ---
 
 ## This is an alternative approach (i.e. rather than using the *git submodule*), since the csv file name and locations appear to remain consistent in the source dataset.
