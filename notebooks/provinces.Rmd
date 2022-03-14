@@ -107,6 +107,8 @@ provinces_data$denominazione_provincia<- gsub("Aosta","Valle d'Aosta / Vallée d
 provinces_data$denominazione_provincia<- gsub("Bolzano","Bolzano / Bozen",provinces_data$denominazione_provincia)
 provinces_data$denominazione_provincia<- gsub("Massa Carrara","Massa-Carrara",provinces_data$denominazione_provincia)
 
+provinces_data[provinces_data$denominazione_regione=="Trentino Alto Adige / Südtirol",]$codice_regione<-4 # Fixed an inconsistency from the DPC dataset (removed the 'artificial' 21 and 22 regional codes) which caused repeated plots (impacted the "local_province_names") for the "Trentino Alto Adige / Südtirol" region.
+
 #provinces_data<-dpc_to_istat_province_name_fix(provinces_data,istat_provinces)
 ```
 
